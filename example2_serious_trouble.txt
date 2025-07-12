@@ -1,0 +1,109 @@
+#Shovel v1.0 input file template
+
+#Provide a path to a folder containing media files, nested media files are not supported.
+input_directory: ./input
+
+	#m/c/h. Should shovel (m)ove, (c)opy, or h)ardlink the source files to the output directory before any modifications?
+	#NB: this affects all files in input_directory.
+	file_input_mode: c
+
+	#y/n. Should shovel ignore the number of audio files included and prompt the user for which single file they want to archive?
+	#This mode will also be used if only one audio file is included.
+	force_single_episode: y
+
+#Where shovel should put its outputted files, needed for editing id tags, renaming files, and making a torrent.
+output_directory: ./output
+
+	#o/t/y. Should shovel organize the outputted files in: (o)ne folder; (t)wo folders where the first is the latest year, and the second
+	#contains all other years; or (y)early folders?
+	#This choice is ignored in single episode mode.
+	file_output_mode: 
+
+		#y/n. Whether this is a full archive of a completed podcast. Needed if file_output_mode is 'o' and ignored otherwise
+		completed_series: 
+
+#y/n. Fix up tags that ABS sets inappropriately, notably only having one source of date data so ABS imports the date properly.
+edit_id_tags: y
+
+	#Some private feeds may add links with identifying info like a token to the "TXXX:Comment" tag for .mp3 files
+	#Identified in Substack private feeds
+	anonymize_comment: y
+
+#y/n. Rename files with "PodcastTitle - YYYY-MM-DD - EpisodeTitle.ext" format.
+rename_files: y
+
+#y/n. If y, only preview changes to file id tags and/or filenames.
+dry_run: n
+
+#y/n. If 'y', shovel will still print warnings but will continue execution without prompting the user.
+#For single episode mode, the most recent episode will be picked.
+ignore_prompts: n
+
+#y/n. Choose whether to create a torrent.	
+create_torrent: y
+
+	announce_url: https://www.tracker.com/announce/123456789abcdef
+
+	torrent_source: TrackerName
+
+#Provide a URL or leave empty. (Urls to) RSS feeds are an easy metadata source if provided. For private feeds it is 
+#recommended to use ABS' Open rss feed feature and share the created URL, as this will already anonymize most data.
+#NB: In the test using this example, this was a private RSS. Instead I've used the public RSS feed for privacy reasons.
+rss_url: https://api.substack.com/feed/podcast/906465.rss
+
+	#y/n. Save a local copy of the rss feed?
+	download_rss: n
+	
+		#y/n. only available currently for ABS created feeds. This will remove additional info not obfuscated
+		#already by ABS like local paths to media.
+		anonymize_rss: n
+
+	#y/n Save a local copy of the album art from the rss feed?
+	download_cover: n
+
+#Provide the name of the podcast if desired to rewrite/override (sometimes private podcasts add "private feed" or 
+#similar to the name). Can usually be skipped.
+title: Serious Trouble
+
+#Provide the source of the podcast if it's paid/premium/subscription other than Patreon (ex: Wondery+ or Substack)
+premium_source: Substack
+
+#y/n. Choose whether to create a bbcode description of the podcast archive. 
+create_description: y
+
+	#Provide a summary of the podcast (or episode, for single episode archives). If not provided, Shovel will source from either the RSS feed or the .mp3 file's id tags (in that order). 
+	summary: 
+
+	#provide a link to the website for the podcast/episode. Reuse a podchaser/podnews/podcast_index url even if it appears below too.
+	website: https://www.serioustrouble.show/
+
+	#provide the number of stars (usually out of 5), and optionally the number of ratings (ex: 12K)
+	stars: 4.7
+	number_reviews: 402
+
+	#Provide as many media links as you desire, each link should be followed by a link to a small "_thumb" 
+	#thumbnails/favicons; suggestions with working ~32x32 thumbnails are given below. You may leave blank entries for convenience.
+	#_____
+	#NB: This version of the RSS feed is just used as a link in a summary and is not used for metadata, this way you may
+	#link here to the public version of the podcast's RSS feed even if you gave a private one for metadata above.
+	media_public_RSS: https://api.substack.com/feed/podcast/906465.rss
+	media_public_RSS_thumb: https://i.ibb.co/1th1ZsmV/rss.png
+
+	media_substack: https://www.serioustrouble.show/
+	media_substack_thumb: https://i.ibb.co/1Z4Jm9T/substacklogo.png
+
+	media_apple_podcasts: https://podcasts.apple.com/us/podcast/serious-trouble/id1630160928
+	media_apple_podcasts_thumb: https://i.ibb.co/sgyyWK7/favicon-itunes.png
+
+	media_spotify: https://open.spotify.com/show/6W4zdAOimAtzTWcmuEez8t
+	media_spotify_thumb: https://i.ibb.co/hR53mkF6/spotify.png
+
+	media_podchaser: https://www.podchaser.com/podcasts/serious-trouble-4758653
+	media_podchaser_thumb: https://i.ibb.co/Xjh6wVb/podchaser-icon28.png
+
+	media_podnews: https://podnews.net/podcast/ia127
+	media_podnews_thumb: https://i.ibb.co/CBDpD3R/podnews-32.png
+
+	media_podcast_index: https://podcastindex.org/podcast/5498851
+	media_podcast_index_thumb: https://i.ibb.co/x1mqPxF/podindex-32.png
+	#_______
