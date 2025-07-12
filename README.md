@@ -15,7 +15,9 @@ This is generally needed just for ABS downloaded files. The former is done becau
 
 ## To run
 
-python3 shovel.py input_file.txt
+Clone the directory, then in the cloned folder run:
+
+~python3 shovel.py input_file.txt
 
 The input files have extensive comments and should be read for further instruction. Shovel should also give you specifics about any problematic input file if you try to run it.
 
