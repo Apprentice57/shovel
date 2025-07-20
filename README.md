@@ -1,6 +1,6 @@
 # shovel
 
-This is a pre alpha version of Shovel, a semi-automated podcast archiving tool. 
+This is a pre alpha version of Shovel, a semi-automated podcast archiving tool.
 
 It is generally intended to be used with .mp3 files downloaded by AudiobookShelf (ABS) (though also tested with .m4a and .ogg files; theoretically .flac and .opus should work too but I have not been able to find a feed with those filetypes to test). It does four main things which, in its finished state, will all be independently selectable:
 
@@ -37,4 +37,6 @@ In addition to cleanup and testing, the additional functionality is planned:
 
 * Add functionality to denote a non english language archive and its language.
 
-   
+* Add more specific naming for single year uploads
+
+* Add more specific filenames if released on same date
