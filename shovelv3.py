@@ -4,7 +4,7 @@ import re
 import requests
 import shutil
 import xml.etree.ElementTree as ET
-import statistics 
+import statistics
 from pathlib import Path
 from mutagen.mp3 import MP3
 from mutagen.easyid3 import EasyID3
@@ -75,7 +75,7 @@ def main():
     supported_filetypes = {"mp3", "m4a", "ogg", "opus", "flac"}
     warn_filetypes(list_filetypes(input_path, warning_filetypes), ignore_prompts)
     print("Checked media filetypes.")
-    
+
     #get the data for all supported audio files in input_directory and sort by date descending
     audio_filepaths = get_audio_filepaths(input_path)
     audio_filepaths_data = get_episodes_data(audio_filepaths)
@@ -91,7 +91,7 @@ def main():
     if len(audio_filepaths) == 1:
         single_episode_mode = True
     else:
-        single_episode_mode = force_single_episode  
+        single_episode_mode = force_single_episode
         if force_single_episode:
             audio_filepaths_data = select_episode(audio_filepaths_data, ignore_prompts)
 
@@ -150,7 +150,7 @@ def html_to_bbcode_links_only(html_text):
     All other formatting is stripped.
     """
     soup = BeautifulSoup(html_text, 'html.parser')
-    
+
     # Convert links to BBCode
     for link in soup.find_all('a'):
         href = link.get('href', '')
@@ -158,14 +158,14 @@ def html_to_bbcode_links_only(html_text):
         if href:
             bbcode_link = f'[url={href}]{text}[/url]'
             link.replace_with(bbcode_link)
-    
+
     # Get the text content (this strips all HTML tags)
     text = soup.get_text()
-    
+
     # Now we need to add back the whitespace from certain tags
     # We'll do this by processing the original HTML again
     soup = BeautifulSoup(html_text, 'html.parser')
-    
+
     # Replace whitespace-adding tags with placeholders before getting text
     whitespace_tags = {
         'p': '\n\n',
@@ -177,7 +177,7 @@ def html_to_bbcode_links_only(html_text):
         'td': '\t',
         'th': '\t',
     }
-    
+
     # Convert links first
     for link in soup.find_all('a'):
         href = link.get('href', '')
@@ -185,7 +185,7 @@ def html_to_bbcode_links_only(html_text):
         if href:
             bbcode_link = f'[url={href}]{text}[/url]'
             link.replace_with(bbcode_link)
-    
+
     # Replace whitespace tags with their whitespace equivalents
     for tag_name, whitespace in whitespace_tags.items():
         for tag in soup.find_all(tag_name):
@@ -196,14 +196,14 @@ def html_to_bbcode_links_only(html_text):
                 # For container tags, add whitespace after the content
                 tag.insert_after(whitespace)
                 tag.unwrap()  # Remove the tag but keep its contents
-    
+
     # Get the final text
     result = soup.get_text()
-    
+
     # Clean up excessive whitespace
     result = '\n'.join(line.strip() for line in result.split('\n'))
     result = result.replace('\n\n\n', '\n\n')  # Max 2 consecutive newlines
-    
+
     return result.strip()
 
 def anonymize_mp3_comment_tag(mp3_path: Path):
@@ -214,7 +214,7 @@ def anonymize_mp3_comment_tag(mp3_path: Path):
             original_text = frame.text[0] if frame.text else ""
             anonymized = re.sub(
                 r'https?://[^ \n\r"]*(token=|user_id=|utm_)[^ \n\r"]*',
-                "http://localhost",
+                "http://invalid",
                 original_text
             )
             frame.text[0] = anonymized
@@ -346,7 +346,7 @@ def create_description_inner(podcast_title, archive_title, description_filename,
             f.write("\n")
             f.write("\n___\n")
             f.write(f"Filetypes(s): [b]{filetypes}[/b] | Bitrate: [b]{bitrate_string}[/b] | Number of Episodes: [b]{num_episodes}[/b]\n")
-            f.write(f"Average Episode Length: [b]{length}min[/b] | Start Date: [b]{start_date}[/b] | Ending Date: [b]{end_date}[/b]\n")
+            f.write(f"Average Episode Length: [b]{length}min[/b] | Start Date: [b]{start_date}[/b] | End Date: [b]{end_date}[/b]\n")
             f.write("[size=10]Assisted by [url=https://github.com/Apprentice57]Shovel[/url][/size]")
             f.write(f"[/center]")
     else:
@@ -532,7 +532,7 @@ def calculate_duration(audio_filepaths_data):
     return round(statistics.mean(durations))
 
 #if there is a very common bitrate, with over 70% occurrence, return that
-#Allow a difference in 10kbps for that 70% occurrence, so that 
+#Allow a difference in 10kbps for that 70% occurrence, so that
 #a file with say (127kbps) and another with (say) 128kbps count toward the 70%
 def calculate_bitrate(audio_filepaths_data):
     bitrates = []
@@ -605,14 +605,14 @@ def anonymize_rss_file(path):
                 val = tag.attrib[attr]
                 if 'url' in attr.lower() or 'href' in attr.lower() or 'token=' in val or 'auth=' in val or 'session=' in val:
                     ext = os.path.splitext(urlparse(val).path)[1]
-                    tag.attrib[attr] = f"http://localhost/{counter}{ext}"
+                    tag.attrib[attr] = f"http://invalid/{counter}{ext}"
                     counter += 1
 
             if tag.text:
                 # Replace entire value if it's a full tag like link/guid/etc
                 if any(s in tag.tag.lower() for s in ['link', 'url', 'guid']):
                     ext = os.path.splitext(urlparse(tag.text).path)[1]
-                    tag.text = f"http://localhost/{counter}{ext}"
+                    tag.text = f"http://invalid/{counter}{ext}"
                     counter += 1
                 else:
                     # Replace matching embedded URLs
@@ -621,7 +621,7 @@ def anonymize_rss_file(path):
                         url = match.group(0)
                         if any(x in url for x in ['token=', 'auth=', 'session=']):
                             ext = os.path.splitext(urlparse(url).path)[1]
-                            replacement = f"http://localhost/{counter}{ext}"
+                            replacement = f"http://invalid/{counter}{ext}"
                             counter += 1
                             return replacement
                         return url
@@ -692,16 +692,16 @@ def edit_id_tags(audio_filepaths_data, album_override, anonymize_comment, dry_ru
             ".m4a": "©alb, soal",
             ".ogg": "Album, Album Sort"
         }
-        
+
         ext = file_path.suffix.lower()
-        
+
         #common tags with vorbis comments
         if ext == ".flac" or ext == ".opus":
             ext = ".ogg"
-        
+
         # Use the date from the tuple instead of calling get_episode_info
         #normalized_date = normalize_date(date)
-        
+
         if not dry_run:
             delete_episode_info(file_path, "date")
             set_episode_info(file_path, "date", date)
@@ -719,15 +719,15 @@ def edit_id_tags(audio_filepaths_data, album_override, anonymize_comment, dry_ru
             deleting_verb = "Would delete"
             setting_verb = "Would set"
             anonymize_verb = "Would Anonymize"
-        
+
         print("--File: " + str(file_path))  # Use .name to get just the filename
         print("  -> " + deleting_verb + " field(s): " + delete_tag_map[ext] + "")
         print("  -> " + setting_verb + " field(s): " + create_tag_map_date[ext] + " to: " + date)
         if album_override != None:
-            print("  -> " + setting_verb + " field(s): " + create_tag_map_title[ext] + " to: " + album_override)  
+            print("  -> " + setting_verb + " field(s): " + create_tag_map_title[ext] + " to: " + album_override)
         if anonymize_comment:
-            print("  -> " + anonymize_verb + " the TXXX:Comment field to remove links with identification.")     
-        print("")  
+            print("  -> " + anonymize_verb + " the TXXX:Comment field to remove links with identification.")
+        print("")
     return
 
 #Currently only suports  "date" and "title" for info
@@ -824,7 +824,7 @@ def transfer_audio_files(audio_filepaths_data, output_path, file_input_mode):
     for i, item in enumerate(audio_filepaths_data):
         source_path = item[0]
         dest_path = output_path / source_path.name
-        
+
         # Transfer based on mode
         if file_input_mode == "m":  # Move
             shutil.move(str(source_path), str(dest_path))
@@ -832,7 +832,7 @@ def transfer_audio_files(audio_filepaths_data, output_path, file_input_mode):
             shutil.copy2(str(source_path), str(dest_path))
         elif file_input_mode == "h":  # Hardlink
             os.link(str(source_path), str(dest_path))
-        
+
         # Update the filepath in the original list, preserving other elements
         audio_filepaths_data[i] = (dest_path,) + item[1:]
 
@@ -841,39 +841,39 @@ def transfer_audio_files(audio_filepaths_data, output_path, file_input_mode):
 def transfer_folder(input_path, output_path, file_input_mode):
     """
     Transfer files from the first subfolder to output directory.
-    
+
     Args:
         input_directory (str): Path to the input directory
         output_directory (str): Path to the output directory
         file_input_mode (str): Transfer mode - "m" (move), "c" (copy), "h" (hardlink)
-    
+
     Returns:
         str: Path to the new folder under output_directory
     """
-    
+
     # Get the first subdirectory found
     subdirs = [d for d in input_path.iterdir() if d.is_dir() and not d.name.startswith(".")]
     if not subdirs:
         return None
-    
+
     first_subdir = subdirs[0]
-    
+
     # Create the destination path
     dest_path = output_path / first_subdir.name
-    
+
     # Transfer based on mode
     if file_input_mode == "m":  # Move
         shutil.move(str(first_subdir), str(dest_path))
     elif file_input_mode == "c":  # Copy
-        shutil.copytree(str(first_subdir), str(dest_path), 
-                       ignore=shutil.ignore_patterns('.DS_Store'), 
+        shutil.copytree(str(first_subdir), str(dest_path),
+                       ignore=shutil.ignore_patterns('.DS_Store'),
                        dirs_exist_ok=True)
     elif file_input_mode == "h":  # Hardlink
-        shutil.copytree(str(first_subdir), str(dest_path), 
+        shutil.copytree(str(first_subdir), str(dest_path),
                        copy_function=os.link,
-                       ignore=shutil.ignore_patterns('.DS_Store'), 
+                       ignore=shutil.ignore_patterns('.DS_Store'),
                        dirs_exist_ok=True)
-    
+
     return dest_path
 
 #return the constituents of filetypes that occur in directory
@@ -993,7 +993,7 @@ def convert_synonyms(config):
                 v = "t"
             if lower_v == "yearly":
                 v = "y"
-            
+
         if lower_v == 'y' or lower_v == 'yes':
             v = 'y'
         if lower_v == 'n' or lower_v == 'no':
@@ -1040,7 +1040,7 @@ def validate_config(config):
                 print("Error: The value for field: '" + field + "' must be 'y' or 'n'.")
                 sys.exit(1)
 
-    multiword = ["title", "summary"]
+    multiword = ["title", "summary", "premium_source"]
     for k, v in config.items():
         if ' ' in v and k not in multiword:
             print("Error: The value for field: '" + k + "' must only be one word: '" + v + "'.")
@@ -1055,7 +1055,7 @@ def validate_config(config):
         print("Error: The value for field: 'file_output_mode' must be 'o', 't', or 'y': '" + value + "'.")
 
     validate_directories(config.get("input_directory"), config.get("output_directory"), config.get("ignore_prompts"))
-    return 
+    return
 
 def validate_directories(input_directory, output_directory, ignore_prompts):
     for path in [input_directory, output_directory]:
@@ -1111,40 +1111,40 @@ def select_episode(episodes_with_dates, ignore_input=False):
     # If ignore_input is True, just return the most recent episode
     if ignore_input:
         return [episodes_with_dates[0]]
-    
+
     page_size = 10
     current_page = 0
     total_episodes = len(episodes_with_dates)
-    
+
     while True:
         # Calculate pagination bounds
         start_idx = current_page * page_size
         end_idx = min(start_idx + page_size, total_episodes)
-        
+
         # Check if we're out of bounds
         if start_idx >= total_episodes:
             print("No more episodes to display.")
             current_page = max(0, current_page - 1)
             continue
-        
+
         # Display current page of episodes
         print(f"\nShowing episodes {start_idx + 1}-{end_idx} of {total_episodes}:")
         print("-" * 60)
-        
+
         current_episodes = episodes_with_dates[start_idx:end_idx]
         for i, (filepath, date, title) in enumerate(current_episodes, 1):
             # Truncate date to YYYY-MM-DDTHH:MM format (remove seconds and beyond)
             truncated_date = date[:16] if len(date) > 16 else date
             print(f"{i:2d}. {truncated_date} - {title}")
-        
+
         # Get user input
         print("\nOptions:")
         print("  Enter 1-10 to select an episode")
         print("  Enter 'n' for next 10 episodes")
         print("  Enter 'p' for previous 10 episodes")
-        
+
         choice = input("Your choice: ").strip().lower()
-        
+
         if choice == 'n':
             # Check if there are more episodes to show
             if end_idx < total_episodes:
